@@ -28,7 +28,7 @@ class Letra extends Service {
 		if ($lyric === false){
 			$response = new Response();
 			$response->setResponseSubject("Letra de cancion no encontrada");
-			$response->createFromText("Letra de canci&oacute;n no encontrada", array());
+			$response->createFromText("Letra de canci&oacute;n no encontrada para <b>$argument</b>. Verfica que escribiste bien el nombre de la canci&oacute;n. Si el problema persiste contacta con el soporte t&eacute;cnico.", array());
 			return $response;
 		}
 		
