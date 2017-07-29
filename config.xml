@@ -1,6 +1,6 @@
 <service>
 	<serviceName>letra</serviceName>
-	<serviceDescription><![CDATA[Devuelve la letra de una canci&oacute;n basado en el t&iacute;tulo]]></serviceDescription>
+	<serviceDescription>Devuelve la letra de una cancion basado en el titulo</serviceDescription>
 	<creatorEmail>salvi.pascual@gmail.com</creatorEmail>
 	<serviceCategory>ocio</serviceCategory>
 	<serviceUsage>

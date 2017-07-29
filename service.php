@@ -15,24 +15,23 @@ class Letra extends Service
 	 * */
 	public function _main(Request $request)
 	{
-		$argument = trim($request->query);
-
-		if ($argument=='')
+		// do not allow blank searches
+		if(empty($request->query))
 		{
 			$response = new Response();
-			$response->setResponseSubject("Falta el nombre de la cancion");
-			$response->createFromText("No escribi&oacute; el nombre de la canci&oacute;n", array());
+			$response->setResponseSubject("Que canci&oacute;n desea buscar?");
+			$response->createFromTemplate("home.tpl", array());
 			return $response;
 		}
 
 		// get the best matching lyric
-		$lyric = $this->getLyric($argument);
+		$lyric = $this->getLyric($request->query);
 
 		if ($lyric === false)
 		{
 			$response = new Response();
 			$response->setResponseSubject("Letra de cancion no encontrada");
-			$response->createFromText("Letra de canci&oacute;n no encontrada para <b>$argument</b>. Verfica que escribiste bien el nombre de la canci&oacute;n. Si el problema persiste contacta con el soporte t&eacute;cnico.", array());
+			$response->createFromText("Letra de canci&oacute;n no encontrada para <b>{$request->query}</b>. Verfica que escribiste bien el nombre de la canci&oacute;n. Si el problema persiste contacta con el soporte t&eacute;cnico.", array());
 			return $response;
 		}
 
@@ -41,7 +40,7 @@ class Letra extends Service
 			"title" => $lyric['title'],
 			"author" => $lyric['author'],
 			"lyric" => $lyric['body'],
-			"song" => ucfirst($argument)
+			"song" => ucfirst($request->query)
 		);
 
 		$response = new Response();
