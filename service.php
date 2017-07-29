@@ -19,7 +19,7 @@ class Letra extends Service
 		if(empty($request->query))
 		{
 			$response = new Response();
-			$response->setResponseSubject("Que canci&oacute;n desea buscar?");
+			$response->setResponseSubject("Que letra desea buscar?");
 			$response->createFromTemplate("home.tpl", array());
 			return $response;
 		}
