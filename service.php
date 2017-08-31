@@ -19,6 +19,7 @@ class Letra extends Service
 		if(empty($request->query))
 		{
 			$response = new Response();
+			$response->setCache();
 			$response->setResponseSubject("Que letra desea buscar?");
 			$response->createFromTemplate("home.tpl", array());
 			return $response;
@@ -44,9 +45,9 @@ class Letra extends Service
 		);
 
 		$response = new Response();
+		$response->setCache();
 		$response->setResponseSubject("Letra: ".$lyric['title']."");
 		$response->createFromTemplate("basic.tpl", $responseContent);
-
 		return $response;
 	}
 
