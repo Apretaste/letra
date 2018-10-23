@@ -22,6 +22,7 @@ class Letra extends Service
 			$response->setCache();
 			$response->setResponseSubject("Que letra desea buscar?");
 			$response->createFromTemplate("home.tpl", array());
+			$response->setCache();
 			return $response;
 		
 
@@ -53,6 +54,7 @@ class Letra extends Service
 		$response->setCache();
 		$response->setResponseSubject("letra:".$title);
 		$response->createFromTemplate("basic.tpl", $responseContent);
+		$response->setCache();
 		return $response;
 			
 
@@ -105,6 +107,7 @@ class Letra extends Service
 			$response = new Response();
 			$response->setResponseSubject("Autor no encontrado");
 			$response->createFromText("Autor no encontrado para <b>{$request->query}</b>. Verfica que escribiste bien el nombre del autor;n. Si el problema persiste contacta con el soporte t&eacute;cnico.<br/>", array());
+			$response->setCache();
 			return $response;
 		}
 		/*if(count($autores)==1){
@@ -138,7 +141,6 @@ class Letra extends Service
 
 		$datos=array_combine($canciones,$enlaces);
 		$autor=explode("/",trim($request->query,"/"));
-		var_dump($autor);
 		$responseContent = array(
 			"author" => $autor[1],
 			"datos" =>$datos
@@ -149,6 +151,7 @@ class Letra extends Service
 		$response->setCache();
 		$response->setResponseSubject("opciones");
 		$response->createFromTemplate("results.tpl", $responseContent);
+		$response->setCache();
 		return $response;
 	}
 	
@@ -170,6 +173,7 @@ class Letra extends Service
 			$response = new Response();
 			$response->setResponseSubject("Letra de cancion no encontrada");
 			$response->createFromText("Letra de canci&oacute;n no encontrada para <b>{$request->query}</b>. Verfica que escribiste bien el nombre de la canci&oacute;n. Si el problema persiste contacta con el soporte t&eacute;cnico.<br/>", array());
+			$response->setCache();
 			return $response;
 		}
 		if(count($links)==1){
@@ -190,6 +194,7 @@ class Letra extends Service
 		$response->setCache();
 		$response->setResponseSubject("opciones");
 		$response->createFromTemplate("results.tpl", $responseContent);
+		$response->setCache();
 		return $response;
 	}
 

@@ -39,6 +39,7 @@
 		{/foreach}
 		</table>
 		{space10}
+		{space10}
 		{button caption="Inicio" href="LETRA"  popup="false"}
 	</center>
 	{else}
