@@ -1,0 +1,49 @@
+<div class="row">
+	<!-- show search item -->
+	<div class="col s12">
+		<p id="noMarg" class="col s6">Resultados para:</p>
+		<h1 class="col s12"><%= results[0].searched %></h1>
+	</div>
+
+	<!-- header for the list -->
+	<ul class="collection with-header">
+		<li class="collection-header">
+			<div id="noMarg" class="row">
+				<div class="col s6">
+					<h2 id="letterColorC">Artista</h2>
+				</div>
+				<div class="col s6">
+					<h2 id="letterColorC">Canción</h2>
+				</div>
+			</div>
+		</li>
+
+		<!-- list with results -->
+		<% results.forEach(function(result){ %>
+		<li id="list" class="collection-item">
+			<div class="row">
+				<!-- author -->
+				<div class="col s6">
+					<a href="#!"
+						onclick="apretaste.send({'command':'LETRA AUTOR','data':{'author':'<%= result.authorLink %>', 'authorName':'<%= result.authorName %>'}})">
+						<h6 id="letterColorA"><%= result.authorName %></h6>
+					</a>
+				</div>
+				<!-- song -->
+				<div class="col s6">
+					<a href="#!"
+						onclick="apretaste.send({'command':'LETRA CANCION','data':{'song':'<%= result.songLink %>', 'songName':'<%= result.songName %>', 'authorName':'<%= result.authorName %>','authorLink':'<%= result.authorLink %>'}})">
+						<h6 id="letterColorB"><%= result.songName %></h6>
+					</a>
+				</div>
+			</div>
+		</li>
+		<% }) %>
+	</ul>
+
+	<!-- back floating button -->
+	<div class="fixed-action-btn">
+		<a class="btn-floating btn-large waves-effect waves-light green" href="#!"
+			onclick="apretaste.send({'command':'LETRA'})"><i class="material-icons">arrow_back</i></a>
+	</div>
+</div>
