@@ -49,8 +49,8 @@ class Service
 
 					// clean the author
 					$author = htmlentities($author, null, 'utf-8');
-					$author = str_replace("&amp;", "&", $author);
 					$author = trim(str_replace(["&nbsp;", "&middot;"], "", $author));
+					$author = html_entity_decode($author, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
 					return ["author"=>$author, "song"=>$song, "link"=>$link];
 				});

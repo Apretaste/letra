@@ -7,9 +7,11 @@
 			<ul class="collection">
 				<li class="collection-item avatar">
 					<i class="material-icons circle">music_note</i>
-					<span class="title blue-grey-text big"><%= item.song %></span>
+					<a href="#!" class="title" onclick="getLyric('<%= item.link %>')">
+						<span class=" blue-grey-text big"><%= item.song %></span>
+					</a>
 					<p><%= item.author %></p>
-					<a href="#!" class="secondary-content" onclick="apretaste.send({'command':'LETRAS LYRIC', 'data':{'link':'<%= item.link %>'}})">
+					<a href="#!" class="secondary-content" onclick="getLyric('<%= item.link %>')">
 						<i class="material-icons">send</i>
 					</a>
 				</li>

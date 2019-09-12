@@ -26,3 +26,10 @@ function get(query) {
 		'data': {query: query},
 	});
 }
+
+function getLyric(query) {
+	apretaste.send({
+		'command': "LETRAS LYRIC", 
+		'data': {'link': query},
+	});
+}
