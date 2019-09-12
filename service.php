@@ -2,206 +2,131 @@
 
 use Goutte\Client;
 
-class Letra extends Service
+class Service
 {
-	static $results = array();
-
 	/**
-	 * Function executed when the service is called
+	 * Home page to search for artirst or lyrics
 	 *
 	 * @author salvipascual
 	 * @param Request
-	 * @return Response
-	 * */
-	public function _main(Request $request)
+	 * @param Response
+	 */
+	public function _main (Request $request, Response $response)
 	{
-		// do not allow blank searches
-		
-		
-			$response = new Response();
-			$response->setCache();
-			$response->setResponseSubject("Que letra desea buscar?");
-			$response->createFromTemplate("home.tpl", array());
-			$response->setCache();
-			return $response;
-		
-
-		
+		$response->setCache("year");
+		$response->setTemplate("home.ejs", []);
 	}
 
 	/**
-	 * Search lyric on the web
+	 * Display a list of artist and lyrics
 	 *
 	 * @author salvipascual
+	 * @param Request
+	 * @param Response
 	 */
-	private function getLyric($search)
+	public function _search (Request $request, Response $response)
 	{
-		
-		$client = new Client();
-		$lyricsPage = $client->request('GET', "http://www.lyricsfreak.com".$search);
-		// get the info from the songs page
-		$titleANDauthor = $lyricsPage->filter('.lyric-song-head');
-		$title = trim(explode("–", $titleANDauthor->html())[1], "Lyrics ");
-		$author = $titleANDauthor->filter('a')->html();
-		$body = $lyricsPage->filter('#content_h')->html();
+		// get the song or artist name encoded
+		$query = urlencode($response->input->data->query);
 
-		$responseContent = array(
-			"title" => $title,
-			"autor" =>$author,
-			"letra"=>$body
-		);
-		$response = new Response();
-		$response->setCache();
-		$response->setResponseSubject("letra:".$title);
-		$response->createFromTemplate("basic.tpl", $responseContent);
-		$response->setCache();
-		return $response;
-			
+		// load from cache if exists
+		$cache = Utils::getTempDir() . date("Ym") . "_letras_" . md5($query) . ".tmp";
+		if(file_exists($cache)) $content = unserialize(file_get_contents($cache));
 
-		
-	}
-	private function getAutor($search){
-		try
-		{
+		// get data from the internet
+		else {
+			try {
+				// get the list of songs
+				$client = new Client();	
+				$crawler = $client->request('GET', "https://www.lyricsfreak.com/search.php?q=$query");
 
-			// access the list of possible songs
-			$client = new Client();
-			$crawler = $client->request('GET', 'https://www.lyricsfreak.com/search.php?a=search&type=band&q='.$search);
-			// acccess the first page on the list of songs
-			$link = $crawler->filter('a.song')->first()->attr('href');
-			$lyricsPage = $client->request('GET', "http://www.lyricsfreak.com".$link);
+				// get the list of authors and songs
+				$list = $crawler->filter('.js-sort-table-content-item')->each(function($node) {
+					// get author, song and link
+					$author = $node->filter('.lf-list__title--secondary')->text();
+					$song = trim($node->filter('.lf-list__meta')->text());
+					$link = trim($node->filter('.lf-list__meta > a')->attr("href"));
 
-			// get the info from the songs page
-			$titleANDauthor = $lyricsPage->filter('.lyric-song-head');
-			$title = trim(explode("–", $titleANDauthor->html())[1], "Lyrics ");
-			$author = $titleANDauthor->filter('a')->html();
-			$body = $lyricsPage->filter('#content_h')->html();
-		}
-		catch(Exception $e)
-		{
-			return false;
+					// clean the author
+					$author = htmlentities($author, null, 'utf-8');
+					$author = str_replace("&amp;", "&", $author);
+					$author = trim(str_replace(["&nbsp;", "&middot;"], "", $author));
+
+					return ["author"=>$author, "song"=>$song, "link"=>$link];
+				});
+			} catch(Exception $e) {
+				return $response->setTemplate('message.ejs', []);
+			}
+
+			$content = [
+				"title" => $response->input->data->query,
+				"list" => $list
+			];
+
+			// save cache file
+			file_put_contents($cache, serialize($content));
 		}
 
-		return array(
-			'title' => $title,
-			'body' => $body,
-			'author' => $author
-		);
+		// message if there are not rsponses
+		if (empty($content['list'])) return $response->setTemplate('message.ejs', []);
+
+		// send data to the view
+		$response->setCache("year");
+		$response->setTemplate("search.ejs", $content);
 	}
-	public function _autor(Request $request){
 
-		$client = new Client();
-		$crawler = $client->request('GET','https://www.lyricsfreak.com/search.php?a=search&type=band&q='.$request->query);
-			//get all links
+	/**
+	 * Display the lyrics for a song
+	 *
+	 * @author salvipascual
+	 * @param Request
+	 * @param Response
+	 */
+	public function _lyric (Request $request, Response $response)
+	{
+		// get the song or artist name encoded
+		$link = $response->input->data->link;
 
-		
-		//get all author
-		$autores_nombre=$crawler->filter('.colfirst a')->each(function($nodo){
-		return $nodo->text();
-		});
-		$autores_link=$crawler->filter('.colfirst a')->each(function($nodo){
-		return $nodo->attr('href');
-		});
-		if (!count($autores_nombre))
-		{
-			$response = new Response();
-			$response->setResponseSubject("Autor no encontrado");
-			$response->createFromText("Autor no encontrado para <b>{$request->query}</b>. Verfica que escribiste bien el nombre del autor;n. Si el problema persiste contacta con el soporte t&eacute;cnico.<br/>", array());
-			$response->setCache();
-			return $response;
+		// load from cache if exists
+		$cache = Utils::getTempDir() . date("Ym") . "_letras_" . md5($link) . ".tmp";
+		if(file_exists($cache)) $content = unserialize(file_get_contents($cache));
+
+		// get data from the internet
+		else {
+			try {
+				// get the song
+				$client = new Client();	
+				$crawler = $client->request('GET', "https://www.lyricsfreak.com$link");
+
+				// get the lytric
+				$lyric = trim($crawler->filter('#content')->text());
+				$lyric = nl2br($lyric);
+
+				// get author
+				$authorTitle = $crawler->filter('.lyric-song-head')->text();
+				$authorTitleArr = explode('–', $authorTitle);
+				$author = trim($authorTitleArr[0]);
+
+				// get the song title
+				$song = trim($authorTitleArr[1]);
+				$song = trim(str_replace("Lyrics", "", $song));
+			} catch(Exception $e) {
+				return $response->setTemplate('message.ejs', []);
+			}
+
+			// create the content array
+			$content = [
+				"author" => $author,
+				"song" => $song,
+				"lyric" => $lyric
+			];
+
+			// save cache file
+			file_put_contents($cache, serialize($content));
 		}
-		/*if(count($autores)==1){
-			return $this->getSongs($autores[0]);
-		}*/
-		//array of data
-		$datos=array_combine($autores_nombre,$autores_link);	
-		// create response
-		$responseContent = array(
-			"nombre" => $request->query,
-			"datos" =>$datos
-			
-		);
 
-		$response = new Response();
-		$response->setCache();
-		$response->setResponseSubject("opciones");
-		$response->createFromTemplate("results.tpl", $responseContent);
-		return $response;
+		// send information to the view
+		$response->setCache("year");
+		$response->setTemplate("lyric.ejs", $content);
 	}
-
-	public function _buscar_canciones(Request $request){
-		$client = new Client();
-		$crawler = $client->request('GET','http://www.lyricsfreak.com/'.$request->query);
-		$canciones=$crawler->filter('.colfirst a')->each(function($nodo){
-		return $nodo->text();
-		});
-		$enlaces=$crawler->filter('.colfirst a')->each(function($nodo){
-		return $nodo->attr('href');
-		});
-
-		$datos=array_combine($canciones,$enlaces);
-		$autor=explode("/",trim($request->query,"/"));
-		$responseContent = array(
-			"author" => $autor[1],
-			"datos" =>$datos
-			
-		);
-
-		$response = new Response();
-		$response->setCache();
-		$response->setResponseSubject("opciones");
-		$response->createFromTemplate("results.tpl", $responseContent);
-		$response->setCache();
-		return $response;
-	}
-	
-	public function _cancion(Request $request){
-		
-		$client = new Client();
-			$crawler = $client->request('GET', 'http://www.lyricsfreak.com/search.php?a=search&type=song&q='.$request->query);
-			//get all links
-		$links=$crawler->filter('a.song')->each(function($nodo){
-		return $nodo->attr('href');
-		});
-		//get all author
-		$autores=$crawler->filter('.colfirst a')->each(function($nodo){
-		return $nodo->text();
-		});
-		
-		if (!count($links))
-		{
-			$response = new Response();
-			$response->setResponseSubject("Letra de cancion no encontrada");
-			$response->createFromText("Letra de canci&oacute;n no encontrada para <b>{$request->query}</b>. Verfica que escribiste bien el nombre de la canci&oacute;n. Si el problema persiste contacta con el soporte t&eacute;cnico.<br/>", array());
-			$response->setCache();
-			return $response;
-		}
-		if(count($links)==1){
-			return $this->getLyric($links[0]);
-		}
-		//array of data
-		$datos=array_combine($autores,$links);	
-
-		// create response
-		$responseContent = array(
-			"title" => $request->query,
-			"datos" =>$datos,
-			"back"=>$request->subject
-			
-		);
-
-		$response = new Response();
-		$response->setCache();
-		$response->setResponseSubject("opciones");
-		$response->createFromTemplate("results.tpl", $responseContent);
-		$response->setCache();
-		return $response;
-	}
-
-	public function _buscar(Request $request){
-		return $this->getLyric($request->query);
-		
-	}
-
-
 }

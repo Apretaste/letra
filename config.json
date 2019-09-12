@@ -1,0 +1,8 @@
+{
+	"name": "letras",
+	"version": "1",
+	"description": "Devuelve la letra de una canción basado en el artista o título",
+	"category": "ocio",
+	"creator": "salvi@apretaste.org",
+	"listed": true
+}

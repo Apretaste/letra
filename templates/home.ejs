@@ -1,22 +1,17 @@
 <div class="row">
 	<div class="col s12">
-		<!-- title -->
-		<h1>B&uacute;squeda de letras</h1>
+		<h1>Letras</h1>
+		<p>Introduzca el nombre de un artista o una canción para encontrar las letras de sus canciones favoritas.</p>
+	</div>
 
-		<!-- description -->
-		<p>Este servicio le ayudará a encontrar las letras de sus canciones favoritas. Introduzca el nombre de un Artista
-			o de una canción</p>
+	<div class="input-field col s12">
+		<input id="query" type="text">
+		<label for="query">Nombre de artista o canción</label>
+	</div>
 
-		<!-- input -->
-		<div class="input-field col s12">
-			<i id="can" class="material-icons prefix">graphic_eq</i>
-			<input id="query" type="text" class="validate">
-			<label for="query">Nombre de artista o de una canción</label>
-		</div>
-		<!-- submit -->
-		<div class="fixed-action-btn">
-			<a class="btn-floating btn-large waves-effect waves-light green" href="#!" onclick="sendSearch()"><i
-					class="material-icons">send</i></a>
-		</div>
+	<div class="fixed-action-btn">
+		<a class="btn-floating btn-large waves-effect waves-light green" href="#!" onclick="getList()">
+			<i class="material-icons">send</i>
+		</a>
 	</div>
 </div>
