@@ -3,19 +3,16 @@
 		<h1 class="no-margin-bottom">Resultados</h1>
 		<p class="no-margin-top">Para "<span class="blue-grey-text"><%= title %></span>"</p>
 
-		<% list.forEach(function(item){ %> 
-			<ul class="collection">
-				<li class="collection-item avatar">
-					<i class="material-icons circle">music_note</i>
-					<a href="#!" class="title" onclick="getLyric('<%= item.link %>')">
+		<% list.forEach(function(item){ %>
+			<a href="#!" class="title" onclick="getLyric('<%= item.link %>')">
+				<ul class="collection">
+					<li class="collection-item avatar">
+						<i class="material-icons circle">music_note</i>
 						<span class=" blue-grey-text big"><%= item.song %></span>
-					</a>
-					<p><%= item.author %></p>
-					<a href="#!" class="secondary-content" onclick="getLyric('<%= item.link %>')">
-						<i class="material-icons">send</i>
-					</a>
-				</li>
-			</ul>
+						<p><%= item.author %></p>
+					</li>
+				</ul>
+			</a>
 		<% }); %>
 	</div>
 </div>
