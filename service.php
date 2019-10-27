@@ -20,9 +20,11 @@ class Service
 	/**
 	 * Display a list of artist and lyrics
 	 *
-	 * @author salvipascual
 	 * @param Request
 	 * @param Response
+	 *
+	 * @return \Response
+	 * @author salvipascual
 	 */
 	public function _search (Request $request, Response $response)
 	{
@@ -37,7 +39,7 @@ class Service
 		else {
 			try {
 				// get the list of songs
-				$client = new Client();	
+				$client = new Client();
 				$crawler = $client->request('GET', "https://www.lyricsfreak.com/search.php?q=$query");
 
 				// get the list of authors and songs
@@ -95,7 +97,7 @@ class Service
 		else {
 			try {
 				// get the song
-				$client = new Client();	
+				$client = new Client();
 				$crawler = $client->request('GET', "https://www.lyricsfreak.com$link");
 
 				// get the lytric
@@ -128,5 +130,7 @@ class Service
 		// send information to the view
 		$response->setCache("year");
 		$response->setTemplate("lyric.ejs", $content);
+
+		Challenges::complete("view-letra", $request->person->id);
 	}
 }
