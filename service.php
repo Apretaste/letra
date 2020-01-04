@@ -1,17 +1,22 @@
 <?php
 
 use Goutte\Client;
+use Apretaste\Request;
+use Apretaste\Response;
+use Apretaste\Challenges;
 
 class Service
 {
 	/**
 	 * Home page to search for artirst or lyrics
 	 *
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 *
+	 * @throws \Framework\Alert
 	 * @author salvipascual
-	 * @param Request
-	 * @param Response
 	 */
-	public function _main (Request $request, Response $response)
+	public function _main (Request $request, Response &$response)
 	{
 		$response->setCache("year");
 		$response->setTemplate("home.ejs", []);
@@ -20,19 +25,20 @@ class Service
 	/**
 	 * Display a list of artist and lyrics
 	 *
-	 * @param Request
-	 * @param Response
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
 	 *
-	 * @return \Response
+	 * @return void
+	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
-	public function _search (Request $request, Response $response)
+	public function _search (Request $request, Response &$response)
 	{
 		// get the song or artist name encoded
 		$query = urlencode($response->input->data->query);
 
 		// load from cache if exists
-		$cache = Utils::getTempDir() . date("Ym") . "_letras_" . md5($query) . ".tmp";
+		$cache = TEMP_PATH . date("Ym") . "_letras_" . md5($query) . ".tmp";
 		if(file_exists($cache)) $content = unserialize(file_get_contents($cache));
 
 		// get data from the internet
@@ -57,7 +63,8 @@ class Service
 					return ["author"=>$author, "song"=>$song, "link"=>$link];
 				});
 			} catch(Exception $e) {
-				return $response->setTemplate('message.ejs', []);
+				$response->setTemplate('message.ejs', []);
+				return;
 			}
 
 			$content = [
@@ -70,7 +77,10 @@ class Service
 		}
 
 		// message if there are not rsponses
-		if (empty($content['list'])) return $response->setTemplate('message.ejs', []);
+		if (empty($content['list'])) {
+			$response->setTemplate('message.ejs', []);
+			return;
+		}
 
 		// send data to the view
 		$response->setCache("year");
@@ -80,17 +90,19 @@ class Service
 	/**
 	 * Display the lyrics for a song
 	 *
+	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Response $response
+	 *
+	 * @throws \Framework\Alert
 	 * @author salvipascual
-	 * @param Request
-	 * @param Response
 	 */
-	public function _lyric (Request $request, Response $response)
+	public function _lyric (Request $request, Response &$response)
 	{
 		// get the song or artist name encoded
 		$link = $response->input->data->link;
 
 		// load from cache if exists
-		$cache = Utils::getTempDir() . date("Ym") . "_letras_" . md5($link) . ".tmp";
+		$cache = TEMP_PATH . date("Ym") . "_letras_" . md5($link) . ".tmp";
 		if(file_exists($cache)) $content = unserialize(file_get_contents($cache));
 
 		// get data from the internet
@@ -113,7 +125,8 @@ class Service
 				$song = trim($authorTitleArr[1]);
 				$song = trim(str_replace("Lyrics", "", $song));
 			} catch(Exception $e) {
-				return $response->setTemplate('message.ejs', []);
+				$response->setTemplate('message.ejs', []);
+				return;
 			}
 
 			// create the content array
