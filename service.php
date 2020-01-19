@@ -1,7 +1,6 @@
 <?php
 
 use Framework\Crawler;
-use Goutte\Client;
 use Apretaste\Request;
 use Apretaste\Response;
 use Apretaste\Challenges;
@@ -11,13 +10,13 @@ class Service
 	/**
 	 * Home page to search for artirst or lyrics
 	 *
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 *
 	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
-	public function _main (Request $request, Response &$response)
+	public function _main(Request $request, Response &$response)
 	{
 		$response->setCache('year');
 		$response->setTemplate('home.ejs', []);
@@ -26,21 +25,23 @@ class Service
 	/**
 	 * Display a list of artist and lyrics
 	 *
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 *
 	 * @return void
 	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
-	public function _search (Request $request, Response &$response)
+	public function _search(Request $request, Response &$response)
 	{
 		// get the song or artist name encoded
 		$query = urlencode($response->input->data->query);
 
 		// load from cache if exists
 		$cache = TEMP_PATH . date('Ym') .'_letras_'. md5($query) .'.tmp';
-		if(file_exists($cache)) $content = unserialize(file_get_contents($cache));
+		if (file_exists($cache)) {
+			$content = unserialize(file_get_contents($cache));
+		}
 
 		// get data from the internet
 		else {
@@ -49,7 +50,7 @@ class Service
 				Crawler::start("https://www.lyricsfreak.com/search.php?q=$query");
 
 				// get the list of authors and songs
-				$list = Crawler::filter('.js-sort-table-content-item')->each(function($node) {
+				$list = Crawler::filter('.js-sort-table-content-item')->each(function ($node) {
 					/** @var \Symfony\Component\DomCrawler\Crawler $node */
 					// get author, song and link
 					$author = $node->filter('.lf-list__title--secondary')->text();
@@ -61,16 +62,16 @@ class Service
 					$author = trim(str_replace(['&nbsp;', '&middot;'], '', $author));
 					$author = html_entity_decode($author, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-					return ['author' =>$author, 'song' =>$song, 'link' =>$link];
+					return ['author' => $author, 'song' => $song, 'link' => $link];
 				});
-			} catch(Exception $e) {
+			} catch (Exception $e) {
 				$response->setTemplate('message.ejs', []);
 				return;
 			}
 
 			$content = [
 					'title' => $response->input->data->query,
-					'list'  => $list
+					'list' => $list
 			];
 
 			// save cache file
@@ -91,20 +92,22 @@ class Service
 	/**
 	 * Display the lyrics for a song
 	 *
-	 * @param \Apretaste\Request  $request
+	 * @param \Apretaste\Request $request
 	 * @param \Apretaste\Response $response
 	 *
 	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
-	public function _lyric (Request $request, Response &$response)
+	public function _lyric(Request $request, Response &$response)
 	{
 		// get the song or artist name encoded
 		$link = $response->input->data->link;
 
 		// load from cache if exists
 		$cache = TEMP_PATH . date('Ym') .'_letras_'. md5($link) .'.tmp';
-		if(file_exists($cache)) $content = unserialize(file_get_contents($cache));
+		if (file_exists($cache)) {
+			$content = unserialize(file_get_contents($cache));
+		}
 
 		// get data from the internet
 		else {
@@ -124,7 +127,7 @@ class Service
 				// get the song title
 				$song = trim($authorTitleArr[1]);
 				$song = trim(str_replace('Lyrics', '', $song));
-			} catch(Exception $e) {
+			} catch (Exception $e) {
 				$response->setTemplate('message.ejs', []);
 				return;
 			}
@@ -132,8 +135,8 @@ class Service
 			// create the content array
 			$content = [
 					'author' => $author,
-					'song'   => $song,
-					'lyric'  => $lyric
+					'song' => $song,
+					'lyric' => $lyric
 			];
 
 			// save cache file
