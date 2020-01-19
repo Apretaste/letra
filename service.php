@@ -1,5 +1,6 @@
 <?php
 
+use Framework\Crawler;
 use Goutte\Client;
 use Apretaste\Request;
 use Apretaste\Response;
@@ -18,8 +19,8 @@ class Service
 	 */
 	public function _main (Request $request, Response &$response)
 	{
-		$response->setCache("year");
-		$response->setTemplate("home.ejs", []);
+		$response->setCache('year');
+		$response->setTemplate('home.ejs', []);
 	}
 
 	/**
@@ -38,29 +39,29 @@ class Service
 		$query = urlencode($response->input->data->query);
 
 		// load from cache if exists
-		$cache = TEMP_PATH . date("Ym") . "_letras_" . md5($query) . ".tmp";
+		$cache = TEMP_PATH . date('Ym') .'_letras_'. md5($query) .'.tmp';
 		if(file_exists($cache)) $content = unserialize(file_get_contents($cache));
 
 		// get data from the internet
 		else {
 			try {
 				// get the list of songs
-				$client = new Client();
-				$crawler = $client->request('GET', "https://www.lyricsfreak.com/search.php?q=$query");
+				Crawler::start("https://www.lyricsfreak.com/search.php?q=$query");
 
 				// get the list of authors and songs
-				$list = $crawler->filter('.js-sort-table-content-item')->each(function($node) {
+				$list = Crawler::filter('.js-sort-table-content-item')->each(function($node) {
+					/** @var \Symfony\Component\DomCrawler\Crawler $node */
 					// get author, song and link
 					$author = $node->filter('.lf-list__title--secondary')->text();
 					$song = trim($node->filter('.lf-list__meta')->text());
-					$link = trim($node->filter('.lf-list__meta > a')->attr("href"));
+					$link = trim($node->filter('.lf-list__meta > a')->attr('href'));
 
 					// clean the author
 					$author = htmlentities($author, null, 'utf-8');
-					$author = trim(str_replace(["&nbsp;", "&middot;"], "", $author));
+					$author = trim(str_replace(['&nbsp;', '&middot;'], '', $author));
 					$author = html_entity_decode($author, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-					return ["author"=>$author, "song"=>$song, "link"=>$link];
+					return ['author' =>$author, 'song' =>$song, 'link' =>$link];
 				});
 			} catch(Exception $e) {
 				$response->setTemplate('message.ejs', []);
@@ -68,8 +69,8 @@ class Service
 			}
 
 			$content = [
-				"title" => $response->input->data->query,
-				"list" => $list
+					'title' => $response->input->data->query,
+					'list'  => $list
 			];
 
 			// save cache file
@@ -83,8 +84,8 @@ class Service
 		}
 
 		// send data to the view
-		$response->setCache("year");
-		$response->setTemplate("search.ejs", $content);
+		$response->setCache('year');
+		$response->setTemplate('search.ejs', $content);
 	}
 
 	/**
@@ -102,28 +103,27 @@ class Service
 		$link = $response->input->data->link;
 
 		// load from cache if exists
-		$cache = TEMP_PATH . date("Ym") . "_letras_" . md5($link) . ".tmp";
+		$cache = TEMP_PATH . date('Ym') .'_letras_'. md5($link) .'.tmp';
 		if(file_exists($cache)) $content = unserialize(file_get_contents($cache));
 
 		// get data from the internet
 		else {
 			try {
 				// get the song
-				$client = new Client();
-				$crawler = $client->request('GET', "https://www.lyricsfreak.com$link");
+				Crawler::start("https://www.lyricsfreak.com$link");
 
 				// get the lytric
-				$lyric = trim($crawler->filter('#content')->text());
+				$lyric = trim(Crawler::filter('#content')->text());
 				$lyric = nl2br($lyric);
 
 				// get author
-				$authorTitle = $crawler->filter('.lyric-song-head')->text();
+				$authorTitle = Crawler::ilter('.lyric-song-head')->text();
 				$authorTitleArr = explode('–', $authorTitle);
 				$author = trim($authorTitleArr[0]);
 
 				// get the song title
 				$song = trim($authorTitleArr[1]);
-				$song = trim(str_replace("Lyrics", "", $song));
+				$song = trim(str_replace('Lyrics', '', $song));
 			} catch(Exception $e) {
 				$response->setTemplate('message.ejs', []);
 				return;
@@ -131,9 +131,9 @@ class Service
 
 			// create the content array
 			$content = [
-				"author" => $author,
-				"song" => $song,
-				"lyric" => $lyric
+					'author' => $author,
+					'song'   => $song,
+					'lyric'  => $lyric
 			];
 
 			// save cache file
@@ -141,9 +141,9 @@ class Service
 		}
 
 		// send information to the view
-		$response->setCache("year");
-		$response->setTemplate("lyric.ejs", $content);
+		$response->setCache('year');
+		$response->setTemplate('lyric.ejs', $content);
 
-		Challenges::complete("view-letra", $request->person->id);
+		Challenges::complete('view-letra', $request->person->id);
 	}
 }
