@@ -120,7 +120,7 @@ class Service
 				$lyric = nl2br($lyric);
 
 				// get author
-				$authorTitle = Crawler::ilter('.lyric-song-head')->text();
+				$authorTitle = Crawler::filter('.lyric-song-head')->text();
 				$authorTitleArr = explode('–', $authorTitle);
 				$author = trim($authorTitleArr[0]);
 
