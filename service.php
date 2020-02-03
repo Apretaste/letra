@@ -10,10 +10,8 @@ class Service
 	/**
 	 * Home page to search for artirst or lyrics
 	 *
-	 * @param \Apretaste\Request $request
-	 * @param \Apretaste\Response $response
-	 *
-	 * @throws \Framework\Alert
+	 * @param Request $request
+	 * @param Response $response
 	 * @author salvipascual
 	 */
 	public function _main(Request $request, Response &$response)
@@ -25,11 +23,8 @@ class Service
 	/**
 	 * Display a list of artist and lyrics
 	 *
-	 * @param \Apretaste\Request $request
-	 * @param \Apretaste\Response $response
-	 *
-	 * @return void
-	 * @throws \Framework\Alert
+	 * @param Request $request
+	 * @param Response $response
 	 * @author salvipascual
 	 */
 	public function _search(Request $request, Response &$response)
@@ -38,7 +33,7 @@ class Service
 		$query = urlencode($response->input->data->query);
 
 		// load from cache if exists
-		$cache = TEMP_PATH . date('Ym') .'_letras_'. md5($query) .'.tmp';
+		$cache = TEMP_PATH . 'cache/' . date('Ym')  . '_letras_'. md5($query) . '.tmp';
 		if (file_exists($cache)) {
 			$content = unserialize(file_get_contents($cache));
 		}
@@ -65,13 +60,12 @@ class Service
 					return ['author' => $author, 'song' => $song, 'link' => $link];
 				});
 			} catch (Exception $e) {
-				$response->setTemplate('message.ejs', []);
-				return;
+				return $response->setTemplate('message.ejs', []);
 			}
 
 			$content = [
-					'title' => $response->input->data->query,
-					'list' => $list
+				'title' => $response->input->data->query,
+				'list' => $list
 			];
 
 			// save cache file
@@ -80,8 +74,7 @@ class Service
 
 		// message if there are not rsponses
 		if (empty($content['list'])) {
-			$response->setTemplate('message.ejs', []);
-			return;
+			return $response->setTemplate('message.ejs', []);
 		}
 
 		// send data to the view
@@ -92,10 +85,8 @@ class Service
 	/**
 	 * Display the lyrics for a song
 	 *
-	 * @param \Apretaste\Request $request
-	 * @param \Apretaste\Response $response
-	 *
-	 * @throws \Framework\Alert
+	 * @param Request $request
+	 * @param Response $response
 	 * @author salvipascual
 	 */
 	public function _lyric(Request $request, Response &$response)
@@ -104,7 +95,7 @@ class Service
 		$link = $response->input->data->link;
 
 		// load from cache if exists
-		$cache = TEMP_PATH . date('Ym') .'_letras_'. md5($link) .'.tmp';
+		$cache = TEMP_PATH . 'cache/' . date('Ym') . '_letras_' . md5($link) . '.tmp';
 		if (file_exists($cache)) {
 			$content = unserialize(file_get_contents($cache));
 		}
@@ -128,25 +119,25 @@ class Service
 				$song = trim($authorTitleArr[1]);
 				$song = trim(str_replace('Lyrics', '', $song));
 			} catch (Exception $e) {
-				$response->setTemplate('message.ejs', []);
-				return;
+				return $response->setTemplate('message.ejs', []);
 			}
 
 			// create the content array
 			$content = [
-					'author' => $author,
-					'song' => $song,
-					'lyric' => $lyric
+				'author' => $author,
+				'song' => $song,
+				'lyric' => $lyric
 			];
 
 			// save cache file
 			file_put_contents($cache, serialize($content));
 		}
 
+		// complete the challenge
+		Challenges::complete('view-letra', $request->person->id);
+
 		// send information to the view
 		$response->setCache('year');
 		$response->setTemplate('lyric.ejs', $content);
-
-		Challenges::complete('view-letra', $request->person->id);
 	}
 }
