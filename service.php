@@ -7,11 +7,14 @@ use Apretaste\Challenges;
 
 class Service
 {
+
 	/**
 	 * Home page to search for artirst or lyrics
 	 *
 	 * @param Request $request
 	 * @param Response $response
+	 *
+	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
 	public function _main(Request $request, Response &$response)
@@ -25,6 +28,9 @@ class Service
 	 *
 	 * @param Request $request
 	 * @param Response $response
+	 *
+	 * @return \Apretaste\Response
+	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
 	public function _search(Request $request, Response &$response)
@@ -87,6 +93,9 @@ class Service
 	 *
 	 * @param Request $request
 	 * @param Response $response
+	 *
+	 * @return \Apretaste\Response
+	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
 	public function _lyric(Request $request, Response &$response)
@@ -95,19 +104,16 @@ class Service
 		$link = $response->input->data->link;
 
 		// load from cache if exists
-		$cache = TEMP_PATH . 'cache/' . date('Ym') . '_letras_' . md5($link) . '.tmp';
-		if (file_exists($cache)) {
-			$content = unserialize(file_get_contents($cache));
-		}
-
-		// get data from the internet
-		else {
+		$cacheName = md5($link);
+		$content = self::loadCache($cacheName);
+		if ($content === null) {
 			try {
 				// get the song
 				Crawler::start("https://www.lyricsfreak.com$link");
 
 				// get the lytric
-				$lyric = trim(Crawler::filter('#content')->text());
+				$lyric = trim(Crawler::filter('#content')->html());
+				$lyric = strip_tags($lyric, 'br');
 				$lyric = nl2br($lyric);
 
 				// get author
@@ -118,19 +124,19 @@ class Service
 				// get the song title
 				$song = trim($authorTitleArr[1]);
 				$song = trim(str_replace('Lyrics', '', $song));
+
+				// create the content array
+				$content = [
+				  'author' => $author,
+				  'song' => $song,
+				  'lyric' => $lyric
+				];
+
+				// save cache file
+				self::saveCache($content, $cacheName);
 			} catch (Exception $e) {
 				return $response->setTemplate('message.ejs', []);
 			}
-
-			// create the content array
-			$content = [
-				'author' => $author,
-				'song' => $song,
-				'lyric' => $lyric
-			];
-
-			// save cache file
-			file_put_contents($cache, serialize($content));
 		}
 
 		// complete the challenge
@@ -139,5 +145,49 @@ class Service
 		// send information to the view
 		$response->setCache('year');
 		$response->setTemplate('lyric.ejs', $content);
+	}
+
+
+	/**
+	 * Get cache file name
+	 *
+	 * @param $name
+	 *
+	 * @return string
+	 */
+	public static function getCacheFileName($name): string
+	{
+		return TEMP_PATH.'cache/letras_'.$name.'_'.date('Ymd').'.tmp';
+	}
+
+	/**
+	 * Load cache
+	 *
+	 * @param $name
+	 * @param null $cacheFile
+	 *
+	 * @return bool|mixed
+	 */
+	public static function loadCache($name, &$cacheFile = null)
+	{
+		$data = null;
+		$cacheFile = self::getCacheFileName($name);
+		if (file_exists($cacheFile)) {
+			$data = unserialize(file_get_contents($cacheFile));
+		}
+		return $data;
+	}
+
+	/**
+	 * Save cache
+	 *
+	 * @param $name
+	 * @param $data
+	 * @param null $cacheFile
+	 */
+	public static function saveCache($name, $data, &$cacheFile = null)
+	{
+		$cacheFile = self::getCacheFileName($name);
+		file_put_contents($cacheFile, serialize($data));
 	}
 }
