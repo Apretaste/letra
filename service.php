@@ -185,7 +185,7 @@ class Service
 	 * @param $data
 	 * @param null $cacheFile
 	 */
-	public static function saveCache($name, $data, &$cacheFile = null)
+	public static function saveCache($data, $name = 'cache', &$cacheFile = null)
 	{
 		$cacheFile = self::getCacheFileName($name);
 		file_put_contents($cacheFile, serialize($data));
