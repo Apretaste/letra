@@ -1,27 +1,26 @@
 <div class="row">
-	<div class="col s12">
-		<h1 class="no-margin-bottom">Resultados</h1>
-		<p class="no-margin-top">Para "<span class="blue-grey-text"><%= title %></span>"</p>
+    <div class="col s12">
+        <div class="chip tiny">
+            <%= title %>
+        </div>
 
-		<% list.forEach(function(item){ %>
-			<a href="#!" class="title" onclick="getLyric('<%= item.link %>')">
-				<ul class="collection">
-					<li class="collection-item avatar">
-						<i class="material-icons circle">music_note</i>
-						<span class=" blue-grey-text big"><%= item.song %></span>
-						<p><%= item.author %></p>
-					</li>
-				</ul>
-			</a>
-		<% }); %>
-	</div>
+        <ul class="collection one-line">
+            <% list.forEach(function(item) { %>
+                <li class="collection-item avatar" onclick="getLyric('<%= item.link %>')">
+                    <i class="tiny material-icons circle">music_note</i>
+                    <span class="title"><%= item.song %></span>
+                    <p class="blue-grey-text"><%= item.author %></p>
+                </li>
+            <% }) %>
+        </ul>
+    </div>
 </div>
 
 <div class="bottom-space"></div>
 
 <!-- back floating button -->
 <div class="fixed-action-btn">
-	<a class="btn-floating btn-large waves-effect waves-light green" href="#!" onclick="apretaste.send({'command':'LETRAS'})">
-		<i class="material-icons">search</i>
-	</a>
+    <a class="btn-floating btn-large waves-effect waves-light green" href="#!" onclick="apretaste.back()">
+        <i class="material-icons">arrow_back</i>
+    </a>
 </div>

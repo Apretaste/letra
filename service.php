@@ -19,8 +19,10 @@ class Service
 	 */
 	public function _main(Request $request, Response &$response)
 	{
+		$images = [SERVICE_PATH . 'letras' . "/images/main_logo.png"];
+
 		$response->setCache('year');
-		$response->setTemplate('home.ejs', []);
+		$response->setTemplate('home.ejs', [], $images);
 	}
 
 	/**
@@ -39,12 +41,10 @@ class Service
 		$query = urlencode($response->input->data->query);
 
 		// load from cache if exists
-		$cache = TEMP_PATH . 'cache/' . date('Ym')  . '_letras_'. md5($query) . '.tmp';
+		$cache = TEMP_PATH . 'cache/' . date('Ym') . '_letras_' . md5($query) . '.tmp';
 		if (file_exists($cache)) {
 			$content = unserialize(file_get_contents($cache));
-		}
-
-		// get data from the internet
+		} // get data from the internet
 		else {
 			try {
 				// get the list of songs
@@ -127,9 +127,9 @@ class Service
 
 				// create the content array
 				$content = [
-				  'author' => $author,
-				  'song' => $song,
-				  'lyric' => $lyric
+					'author' => $author,
+					'song' => $song,
+					'lyric' => $lyric
 				];
 
 				// save cache file
@@ -157,7 +157,7 @@ class Service
 	 */
 	public static function getCacheFileName($name): string
 	{
-		return TEMP_PATH.'cache/letras_'.$name.'_'.date('Ymd').'.tmp';
+		return TEMP_PATH . 'cache/letras_' . $name . '_' . date('Ymd') . '.tmp';
 	}
 
 	/**

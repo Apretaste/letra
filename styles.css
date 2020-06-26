@@ -1,19 +1,48 @@
 .no-margin-top {
-	margin-top: 0px;
+    margin-top: 0px;
 }
 
 .no-margin-bottom {
-	margin-bottom: 0px;
+    margin-bottom: 0px;
 }
 
 .big {
-	font-size: 1.5em !important;
+    font-size: 1.5em !important;
 }
 
 .collection-item.avatar {
-	min-height: 0px !important;
+    min-height: 0px !important;
 }
 
 .bottom-space {
-	margin-bottom: 80px;
+    margin-bottom: 80px;
+}
+
+.home img {
+    margin: 30% 0px 20px 0px;;
+    height: 150px;
+}
+
+.chip .icon {
+    float: left;
+    font-size: 16px;
+    line-height: 32px;
+    padding-right: 5px;
+}
+
+.chip.tiny {
+    height: 20px;
+    padding: 0 10px;
+    line-height: 20px;
+    font-size: x-small;
+}
+
+.chip.tiny .icon {
+    line-height: 20px;
+}
+
+/* ONE LINE COLLECTION */
+
+.collection.one-line .avatar {
+    min-height: 0px;
 }

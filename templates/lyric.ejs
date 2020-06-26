@@ -1,17 +1,17 @@
 <div class="row">
-	<div class="col s12">
-		<h1 class="no-margin-bottom"><%= song %></h1>
-		<p class="no-margin-top">Por <a href="#!" onclick="get('<%= author %>')"><%= author %></a></p>
+    <div class="col s12">
+        <h1 class="no-margin-bottom"><%= song %></h1>
+        <p class="no-margin-top">Por <a href="#!" onclick="get('<%= author %>')"><%= author %></a></p>
 
-		<div><%- lyric %></div>
-	</div>
+        <div><%- lyric %></div>
+    </div>
 </div>
 
 <div class="bottom-space"></div>
 
 <!-- back floating button -->
 <div class="fixed-action-btn">
-	<a class="btn-floating btn-large waves-effect waves-light green" href="#!" onclick="apretaste.send({'command':'LETRAS'})">
-		<i class="material-icons">search</i>
-	</a>
+    <a class="btn-floating btn-large waves-effect waves-light green" href="#!" onclick="apretaste.back()">
+        <i class="material-icons">arrow_back</i>
+    </a>
 </div>
