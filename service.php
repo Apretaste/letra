@@ -7,22 +7,17 @@ use Apretaste\Challenges;
 
 class Service
 {
-
 	/**
 	 * Home page to search for artirst or lyrics
 	 *
 	 * @param Request $request
 	 * @param Response $response
-	 *
-	 * @throws \Framework\Alert
 	 * @author salvipascual
 	 */
-	public function _main(Request $request, Response &$response)
+	public function _main(Request $request, Response $response)
 	{
-		$images = [SERVICE_PATH . 'letras' . "/images/main_logo.png"];
-
 		$response->setCache('year');
-		$response->setTemplate('home.ejs', [], $images);
+		$response->setTemplate('home.ejs');
 	}
 
 	/**
@@ -30,12 +25,10 @@ class Service
 	 *
 	 * @param Request $request
 	 * @param Response $response
-	 *
-	 * @return \Apretaste\Response
-	 * @throws \Framework\Alert
+	 * @return Response
 	 * @author salvipascual
 	 */
-	public function _search(Request $request, Response &$response)
+	public function _search(Request $request, Response $response)
 	{
 		// get the song or artist name encoded
 		$query = urlencode($response->input->data->query);
@@ -93,12 +86,10 @@ class Service
 	 *
 	 * @param Request $request
 	 * @param Response $response
-	 *
-	 * @return \Apretaste\Response
-	 * @throws \Framework\Alert
+	 * @return Response
 	 * @author salvipascual
 	 */
-	public function _lyric(Request $request, Response &$response)
+	public function _lyric(Request $request, Response $response)
 	{
 		// get the song or artist name encoded
 		$link = $response->input->data->link;
@@ -152,7 +143,6 @@ class Service
 	 * Get cache file name
 	 *
 	 * @param $name
-	 *
 	 * @return string
 	 */
 	public static function getCacheFileName($name): string
@@ -165,7 +155,6 @@ class Service
 	 *
 	 * @param $name
 	 * @param null $cacheFile
-	 *
 	 * @return bool|mixed
 	 */
 	public static function loadCache($name, &$cacheFile = null)
