@@ -145,6 +145,7 @@ class Service
 
 		// send information to the view
 		$response->setCache('year');
+		$content['link'] = $link;
 		$response->setTemplate('lyric.ejs', $content);
 	}
 
