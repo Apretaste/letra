@@ -129,7 +129,8 @@ class Service
 				$content = [
 					'author' => $author,
 					'song' => $song,
-					'lyric' => $lyric
+					'lyric' => $lyric,
+					'link' => $link
 				];
 
 				// save cache file
