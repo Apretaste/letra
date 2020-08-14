@@ -46,3 +46,19 @@
 .collection.one-line .avatar {
     min-height: 0px;
 }
+
+
+.btn-floating.second {
+    margin-right: -10px;
+    width: 45px;
+    height: 45px;
+    line-height: 58px;
+}
+
+.btn-floating.third {
+    bottom: 45px;
+    left: 87px;
+    width: 45px;
+    height: 45px;
+    line-height: 58px;
+}
