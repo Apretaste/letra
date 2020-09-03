@@ -41,7 +41,7 @@ $(document).ready(function() {
 var share;
 function init(link, song, author) {
 	share = {
-		text: author + removeTags(author).substr(0, 100),
+		text: author + removeTags(author).substr(0, 50) + '...',
 		icon: 'music',
 		send: function () {
 			apretaste.send({
