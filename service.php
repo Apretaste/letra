@@ -120,7 +120,8 @@ class Service
 				$content = [
 					'author' => $author,
 					'song' => $song,
-					'lyric' => $lyric
+					'lyric' => $lyric,
+					'link' => $link
 				];
 
 				// save cache file
@@ -135,6 +136,7 @@ class Service
 
 		// send information to the view
 		$response->setCache('year');
+		$content['link'] = $link;
 		$response->setTemplate('lyric.ejs', $content);
 	}
 
