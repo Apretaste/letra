@@ -33,3 +33,61 @@ function getLyric(query) {
 		'data': {'link': query},
 	});
 }
+
+$(document).ready(function() {
+	$('.modal').modal();
+});
+
+function teaser(text) {
+	return text.length <= 50 ? text : text.substr(0, 50) + "...";
+}
+
+var share;
+
+function init(link, song, author) {
+	share = {
+		text: teaser(author + ' -' + removeTags(song)),
+		icon: 'music',
+		send: function () {
+			apretaste.send({
+				command: 'PIZARRA PUBLICAR',
+				redirect: false,
+				callback: {
+					name: 'toast',
+					data: 'La letra de fue compartida en Pizarra'
+				},
+				data: {
+					text: $('#message').val(),
+					image: '',
+					link: {
+						command: btoa(JSON.stringify({
+							command: 'LETRAS LYRIC',
+							data: {
+								link: link
+							}
+						})),
+						icon: share.icon,
+						text: share.text
+					}
+				}
+			})
+		}
+	};
+}
+
+function toast(message){
+	M.toast({html: message});
+}
+
+
+function removeTags(str) {
+	if ((str===null) || (str===''))
+		return '';
+	else
+		str = str.toString();
+
+	// Regular expression to identify HTML tags in
+	// the input string. Replacing the identified
+	// HTML tag with a null string.
+	return str.replace( /(<([^>]+)>)/ig, '');
+}
